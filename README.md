@@ -20,6 +20,6 @@ Como usar:
 Ou
 bash bloqueiodigital
 
-3. E execute: configuração 
+3. E execute:
 4. Agora, se fez tudo certo, Termux vai pedir para colocar o dedo. É só vc se registrar e pronto. Depois disso, toda vez que entrar no Termux, precisa-se desbloqueá-lo com uma impressão digital.
 
