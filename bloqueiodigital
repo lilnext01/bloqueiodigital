@@ -1,0 +1,78 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+# Author:  @lilnext   (github.com/lilnext01)
+
+##! Se você mantiver "Autenticação necessária". Verifica: ## 
+1. Tanto o termux quanto o termux-api são baixados do playstore. ## (Ambos os aplicativos são gratuitos. Não faça download de outros sites ## like apkmirror.com) ou se você tiver f-droid, faça o download ## de lá. Mas lembre-se de baixar ambos da mesma fonte. ## 
+2. Verifique sua conexão com a Internet. ## tente executar o seguinte comando manualmente e execute a instalação novamente. ## apt-get update && apt-get upgrade ## apt-get install termux-api ## 
+3. Se ainda não estiver funcionando, pode ser o problema do dispositivo. ## verifique se sua versão do Android é 6.0+.
+
+
+#colors e outras variáveis.
+R='\033[1;31m'
+C='\033[0;36m'
+B='\033[1;34m'
+G='\033[1;32m'
+Y='\033[1;33m'
+U='\033[3A'
+N='\033[0m'
+FILE=$(which login)
+
+trap 'echo -en "$N"' 0 1 15 20
+
+#Banner
+clear
+echo
+echo -e $B" ┌─────────────────────────┐ "
+echo -e $B" │$C TERMUX FINGERPRINT LOCK $B│"
+echo -e $B" └─────────────────────────┘ "
+echo -e $R"  -> @lilnext "
+echo
+echo
+
+
+#Verifique se o bloqueio já existe.
+if grep -q "termux-fingerprint" $FILE; then
+  echo -e $Y" [*] Removendo bloqueio......................\r\n"
+  echo -e $G" [!] Autentificação requerida\r $U"
+#Authenticate impressão digital, se for bem-sucedido, excluir o bloqueio
+  if termux-fingerprint | grep -q "AUTH_RESULT_SUCCESS"; then
+    sed -i '/termux-fingerprint/d' $FILE
+    rm -f $0
+
+    echo -e $Y" [!] Removendo bloqueio.................. $G FEITO"
+
+  #else exit
+  else
+    echo -e $Y" [!] Removendo bloqueio......................$R ERR\n"
+    echo -e $R" [!] Saindo...                               "
+    exit 1
+  fi
+
+# se o bloqueio não existe. definir um
+else
+  echo -ne $Y" [*] Instalando Dependências............\r"
+
+  apt-get update &> /dev/null && apt-get upgrade -y &> /dev/null
+  apt-get install termux-api -y &> /dev/null
+
+  echo -e $Y" [!] Instalando Dependências............$G FEITO\n"
+  echo -e $Y" [*] Bloqueio de configuração.......................\n"
+  echo -e $G" [!] Autentificação requerida\r $U"
+
+  #Teste se a impressão digital está funcionando.
+  if termux-fingerprint | grep -q "AUTH_RESULT_SUCCESS"; then
+    sed -i '2 a termux-fingerprint -c Exit | grep -q "AUTH_RESULT_SUCCESS"; [ $? -ne 0 ] && exit' $FILE
+
+    echo -e $Y" [!] Bloqueio de configuração..................$G FEITO\n"
+    echo "                                   "
+
+  #else pular configuração e sair
+  else
+    echo -e $Y" [!] Bloqueio de configuração.......................$R ERR\n"
+    echo -e $R" [!] Saindo...                               "
+    exit 1
+  fi
+fi
+
+#
